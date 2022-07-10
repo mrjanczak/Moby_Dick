@@ -166,7 +166,7 @@ current_room = town[0][2]
 player = Actor("ismael",name = 'ismael', costiume = 'costiume1')
 player.costiume = "costiume1"
 player.icon = player.image
-player.anchors=[(250, 450),(300, 450),(250, 500),(200, 450)]
+player.anchors=[(160, 500),(120, 450),(140, 500),(100, 450)]
 player.steps = [
     ['e1','e2','e3','e2_','e1_','e4','e5','e4_'],
     ['s1','s2','s3','s2_','s1_','s4','s5','s4_'],
@@ -225,15 +225,17 @@ def draw():
 
         if player.layer == l:
             player.draw()
-            screen.draw.circle(player.pos, 2, (255,0,0))
+            # screen.draw.circle(player.pos, 2, (255,0,0))
+            poly_color = (255, 0, 0)
+        else:
+            poly_color = (100, 100, 100)
 
-        poly = current_room.layers[player.layer].poly
-        if isinstance(poly, Polygon):
-            c = poly.exterior.coords
-            screen.draw.line(c[0], c[1], (255, 0, 0))
-            screen.draw.line(c[1], c[2], (255, 0, 0))
-            screen.draw.line(c[2], c[3], (255, 0, 0))
-            screen.draw.line(c[3], c[0], (255, 0, 0))
+        # if isinstance(layer.poly, Polygon):
+        #     c = layer.poly.exterior.coords
+        #     screen.draw.line(c[0], c[1], poly_color)
+        #     screen.draw.line(c[1], c[2], poly_color)
+        #     screen.draw.line(c[2], c[3], poly_color)
+        #     screen.draw.line(c[3], c[0], poly_color)
 
 
     screen.draw.text(command, (20, 20), fontsize=20)
