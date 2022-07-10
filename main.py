@@ -6,7 +6,7 @@ from math import sin, cos, pi
 import numpy as np
 from adventurelib import *
 from adventurelib import _handle_command
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Point, LinearRing, Polygon
 from pprint import pprint
 
 # poly = Polygon(((0, 0), (0, 1), (1, 1), (1, 0)))
@@ -87,7 +87,10 @@ town_a2 = Room("""You wander into the poorest, most deserted streets near the wa
 There is a cheap inn called "The Spouter Inn," run by someone unfortunately named Peter Coffin. (Bad omen? You decide.)""")
 town_a3 = Room("You are in front of \"Whaleman’s Chapel\", which most sailors visit before they embark on a voyage.")
 town_a3.layers = [ Layer('chapel_l1'), Layer('chapel_l2', layer_poly(Point(740,370)) ), Layer('chapel_door1')]
-town_a3.excluded = [ A(Polygon([[739,372],[659,350],[676,326],[624,314],[607,334],[315,250],[479,106],[799,197],[799,322]])),
+
+# Chapel edge offset - to do check exits
+ring = LinearRing([[739,372],[659,350],[676,326],[624,314],[607,334],[315,250],[479,106],[799,197],[799,322]]).parallel_offset(0, 'right')
+town_a3.excluded = [ A(Polygon(ring.coords)),
                      A(Polygon([[619,311],[594,340],[659,360],[681,326]]), tag='door_closed'),
                      A(Polygon([[658,350],[656,389],[685,358]]), False, tag="door_open") ]                
 town_a4 = Room("You are in the port. You see 3 ships moored to harbour")
@@ -102,7 +105,7 @@ town_a3.west.point = Point(500,300)
 # Define town's interiors
 # Chapel : Floor + Wall1 | Barrier | Desks 2x4
 # Studio render settings: Photoreal | Orthographic | 
-# Rotation 1st box | Pan X -580 Y 268 | Zoom 2
+# Rotation 1st box | Pan X -580 Y 258 | Zoom 2
 
 chapel_candle = Item('chapel candle', 'candle', image='chapel_candle', pos = (0,0), pick_at = None) 
 chapel = Room("""When You enter the chapel, you find a group of sailors, and sailors’ wives and widows sitting silently, each of them lost in their own thoughts.
@@ -110,6 +113,7 @@ They all seem to be reading the different plaques on the walls—memorials to me
 chapel.items = Bag([chapel_candle])
 chapel.exit1   = Exit(town_a3,A(Polygon([[399,545],[422,522],[557,561],[530,581]])),  Point(505,535), )
 town_a3.entry1 = Exit(chapel, A(Polygon([[612,334],[624,319],[665,330],[654,34]])),   Point(630,350), is_open = False )
+chapel.scale = 0.27
 chapel.layers = [
     Layer('chapel_floor',   items = [chapel_candle]),
     Layer('chapel_barrier',  layer_poly(Point(163,397)) ),
@@ -208,9 +212,11 @@ def blit_text(surface, text, pos, font=pygame.font.SysFont('Arial', 20), color=p
         y += word_height  # Start on new row.
 
 def draw():
+    global player, current_room
     screen.clear()
 
     for l,layer in enumerate(current_room.layers):
+        image_path = os.path.join('')
         screen.blit(layer.image, (0, 0))
 
         if layer.items:
@@ -219,8 +225,17 @@ def draw():
 
         if player.layer == l:
             player.draw()
-            screen.draw.circle(player.pos, 5, (255,0,0))
-    
+            screen.draw.circle(player.pos, 2, (255,0,0))
+
+        poly = current_room.layers[player.layer].poly
+        if isinstance(poly, Polygon):
+            c = poly.exterior.coords
+            screen.draw.line(c[0], c[1], (255, 0, 0))
+            screen.draw.line(c[1], c[2], (255, 0, 0))
+            screen.draw.line(c[2], c[3], (255, 0, 0))
+            screen.draw.line(c[3], c[0], (255, 0, 0))
+
+
     screen.draw.text(command, (20, 20), fontsize=20)
     blit_text(screen.surface, message, (20, 40))
 
