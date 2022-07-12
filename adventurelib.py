@@ -147,10 +147,12 @@ class Layer:
         poly - polygon where player has to be covered by layer, 
         items - objects, characters at layer"""
 
-    def __init__(self, image, poly = None, items = [], **kwargs):
+    def __init__(self, image, poly = None, active = True, items = [], **kwargs):
         self.image = image
         self.poly = poly
         self.items = items
+        self.active = active
+
         for key, value in kwargs.items():
             object.__setattr__(self, key, value)  
 
@@ -173,8 +175,8 @@ class Stairs:
         bet(list(2)) - angles of player moves, 
         chasm(Polygon) - area where player falls down)"""
 
-    def __init__(self, steps, bet = [0,0], chasm = None, **kwargs):
-        self.steps = steps
+    def __init__(self, a, bet = [0,0], chasm = None, **kwargs):
+        self.a = a
         self.bet = bet
         self.chasm = chasm
         for key, value in kwargs.items():
