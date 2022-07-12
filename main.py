@@ -16,6 +16,7 @@ MARGIN = 10
 
 # size of standard lego plate in px - one room
 ROOM_W, ROOM_H = 700,700
+EDGES  = False
 
 # Orthogonal view directions
 ALF0 = 40.5
@@ -248,46 +249,50 @@ def draw():
             if layer.items:
                 for i, item in enumerate(layer.items): 
                     screen.blit(item.image, item.pos)
-
-            color = (100, 100, 100)
-            if isinstance(layer.poly, Polygon):
-                draw_poly(layer.poly, color)                    
-
+            
         if player.layer == l:
             player.draw()     
 
-    if hasattr(current_room, 'exits'): 
-        color = (0, 0, 255)
-        for dir in current_room.exits():
-            exit = current_room.exit(dir)
-            if exit.a.active:
-                draw_poly(exit.a.poly, color)
-
-    if hasattr(current_room, 'included'): 
-        color = (0, 255, 0)
-        for a in current_room.included:
-            if a.active:
-                draw_poly(a.poly, color)
-
-    if hasattr(current_room, 'excluded'): 
-        color = (255, 0, 0)
-        for a in current_room.excluded:
-            if a.active:
-                draw_poly(a.poly, color)
-
-    if hasattr(current_room, 'stairs'): 
-        color = (255, 255, 0)
-        for stairs in current_room.stairs:
-            if stairs.a.active:
-                draw_poly(stairs.a.poly, color)
-
-    color = (255, 0, 0)
-    screen.draw.circle(player.pos, 2, color)
-    draw_poly(player.base, color)   
-
     screen.draw.text(command, (20, 20), fontsize=20)
     blit_text(screen.surface, message, (20, 40))
-    blit_text(screen.surface, 'layer ' + str(player.layer), (20, 550))
+
+    if EDGES:
+        if hasattr(current_room, 'layer'):
+            color = (100, 100, 100)
+            for layer in current_room.layers:
+                if layer.active and isinstance(layer.poly, Polygon):
+                    draw_poly(layer.poly, color)
+
+        if hasattr(current_room, 'exits'): 
+            color = (0, 0, 255)
+            for dir in current_room.exits():
+                exit = current_room.exit(dir)
+                if exit.a.active:
+                    draw_poly(exit.a.poly, color)
+
+        if hasattr(current_room, 'included'): 
+            color = (0, 255, 0)
+            for a in current_room.included:
+                if a.active:
+                    draw_poly(a.poly, color)
+
+        if hasattr(current_room, 'excluded'): 
+            color = (255, 0, 0)
+            for a in current_room.excluded:
+                if a.active:
+                    draw_poly(a.poly, color)
+
+        if hasattr(current_room, 'stairs'): 
+            color = (255, 255, 0)
+            for stairs in current_room.stairs:
+                if stairs.a.active:
+                    draw_poly(stairs.a.poly, color)
+
+        color = (255, 0, 0)
+        screen.draw.circle(player.pos, 2, color)
+        draw_poly(player.base, color)   
+        blit_text(screen.surface, 'layer ' + str(player.layer), (20, 550))
+
 
 def on_mouse_down(pos):
     if player.collidepoint(pos):
