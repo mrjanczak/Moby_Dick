@@ -9,6 +9,8 @@ from adventurelib import _handle_command
 from shapely.geometry import Point, LinearRing, Polygon
 from pprint import pprint
 
+# Demo version
+
 # screen size
 WIDTH = 800
 HEIGHT = 600
